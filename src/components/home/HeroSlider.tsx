@@ -35,8 +35,8 @@ export const HeroSlider = ({ slides }: { slides: Slide[] }) => {
                 {s.eyebrow && <div className="hero__eyebrow">{s.eyebrow}</div>}
                 <h2 className="hero__heading">{s.heading}</h2>
                 {s.text && <p className="hero__text">{s.text}</p>}
-                {s.buttonLabel && s.link && (
-                  <Link href={s.link} className="btn btn--accent" tabIndex={i === index ? 0 : -1}>
+                {s.buttonLabel && (
+                  <Link href={s.link || '/collections/all'} className="btn btn--accent" tabIndex={i === index ? 0 : -1}>
                     {s.buttonLabel}
                   </Link>
                 )}

@@ -200,6 +200,7 @@ export const seed = async (payload: Payload, { force = false } = {}) => {
     for (const seedSlide of homepage.heroSlides) {
       const match = slides.find((sl) => sl.heading === seedSlide.heading)
       if (match) {
+        if (!match.link && seedSlide.link) match.link = seedSlide.link
         if (!match.mobileImage && seedSlide.mobileImage) {
           match.mobileImage = (await upload(seedSlide.mobileImage, `${seedSlide.heading} (phone)`)) ?? undefined
         }

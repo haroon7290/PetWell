@@ -157,8 +157,8 @@ export default async function HomePage() {
                     ))}
                   </ul>
                 )}
-                {fb.buttonLabel && fb.link && (
-                  <Link href={fb.link} className="btn btn--accent">
+                {fb.buttonLabel && (
+                  <Link href={fb.link || '/collections/all'} className="btn btn--accent">
                     {fb.buttonLabel}
                   </Link>
                 )}
@@ -202,8 +202,8 @@ export default async function HomePage() {
               <div className="image-banner__content">
                 <h2>{ib.heading}</h2>
                 {ib.text && <p>{ib.text}</p>}
-                {ib.buttonLabel && ib.link && (
-                  <Link href={ib.link} className="btn btn--accent" style={{ minWidth: 220 }}>
+                {ib.buttonLabel && (
+                  <Link href={ib.link || '/collections/all'} className="btn btn--accent" style={{ minWidth: 220 }}>
                     {ib.buttonLabel}
                   </Link>
                 )}
