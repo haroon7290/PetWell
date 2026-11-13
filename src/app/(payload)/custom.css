@@ -1,0 +1,24 @@
+/* Pet Well admin theme */
+:root {
+  --theme-success-500: #1e5b4f;
+}
+
+.nav__brand svg,
+.graphic-icon {
+  width: 26px;
+  height: 26px;
+}
+
+/* Friendlier, bolder primary buttons */
+.btn--style-primary {
+  background-color: #1e5b4f;
+}
+.btn--style-primary:hover {
+  background-color: #163f37;
+}
+
+/* Make field descriptions a little easier to read */
+.field-description {
+  font-size: 13px;
+  line-height: 1.45;
+}
