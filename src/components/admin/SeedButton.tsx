@@ -30,9 +30,9 @@ export const SeedButton = () => {
         background: 'rgba(242,140,40,0.07)',
       }}
     >
-      <strong>Your shop is empty.</strong>
+      <strong>Your shop isn’t set up yet.</strong>
       <p style={{ margin: '6px 0 12px' }}>
-        Import the Pet Well products, homepage, photos, articles and pages to get started. This takes about a minute.
+        Import the Pet Well products, homepage, photos, articles and pages. This takes about a minute, and you can click it again any time to fill in anything that’s missing.
       </p>
       <button
         type="button"

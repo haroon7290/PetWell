@@ -23,15 +23,31 @@ const MIME: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', pn
  */
 export const seed = async (payload: Payload, { force = false } = {}) => {
   const log: string[] = []
-  const existing = await payload.count({ collection: 'products' })
-  if (existing.totalDocs > 0 && !force) {
-    return { ok: false, message: 'Your shop already has products, so nothing was imported.' }
-  }
+  void force
 
   const imageCache = new Map<string, Id | null>()
   const upload = async (file: string, alt: string, base = SHOPIFY_FILES): Promise<Id | null> => {
     const key = base + file
     if (imageCache.has(key)) return imageCache.get(key)!
+    // Re-use a photo imported on an earlier run.
+    // (Storage may have renamed it, e.g. Dog.jpg → Dog-1.jpg.)
+    const dot = file.lastIndexOf('.')
+    const stem = file.slice(0, dot)
+    const ext = file.slice(dot)
+    const escape = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const sameFile = new RegExp(`^${escape(stem)}(-\\d+)?${escape(ext)}$`, 'i')
+    const candidates = await payload.find({
+      collection: 'media',
+      where: { filename: { like: stem } },
+      limit: 50,
+      depth: 0,
+      sort: 'createdAt',
+    })
+    const already = candidates.docs.find((d) => d.filename && sameFile.test(d.filename))
+    if (already) {
+      imageCache.set(key, already.id)
+      return already.id
+    }
     try {
       const res = await fetch(`${key}?width=2000`)
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -68,7 +84,24 @@ export const seed = async (payload: Payload, { force = false } = {}) => {
   // Products
   const productIds: Record<string, Id> = {}
   for (const p of products) {
-    const images = (await Promise.all(p.images.map((f) => upload(f, p.title)))).filter((x): x is Id => x !== null)
+    const found = await payload.find({ collection: 'products', where: { slug: { equals: p.slug } }, limit: 1, depth: 0 })
+    const existingProduct = found.docs[0]
+    if (existingProduct && (existingProduct.images?.length ?? 0) > 0) {
+      productIds[p.slug] = existingProduct.id
+      continue
+    }
+    const images: Id[] = []
+    for (const f of p.images) {
+      const id = await upload(f, p.title)
+      if (id !== null) images.push(id)
+    }
+    if (existingProduct) {
+      if (images.length) {
+        await payload.update({ collection: 'products', id: existingProduct.id, data: { images: images as never } })
+      }
+      productIds[p.slug] = existingProduct.id
+      continue
+    }
     const doc = await payload.create({
       collection: 'products',
       data: {
@@ -101,7 +134,14 @@ export const seed = async (payload: Payload, { force = false } = {}) => {
 
   // Articles
   for (const post of posts) {
+    const foundPost = await payload.find({ collection: 'posts', where: { slug: { equals: post.slug } }, limit: 1, depth: 0 })
+    const existingPost = foundPost.docs[0]
+    if (existingPost?.image) continue
     const image = await upload(post.image, post.title, SHOPIFY_ARTICLES)
+    if (existingPost) {
+      if (image) await payload.update({ collection: 'posts', id: existingPost.id, data: { image } })
+      continue
+    }
     await payload.create({
       collection: 'posts',
       data: {
@@ -143,7 +183,7 @@ export const seed = async (payload: Payload, { force = false } = {}) => {
   await payload.updateGlobal({
     slug: 'homepage',
     data: {
-      heroSlides: (await withImage(homepage.heroSlides, 'heading')) as never,
+      heroSlides: (await withImage(homepage.heroSlides, 'heading')).filter((sl) => sl.image) as never,
       promoTiles: (await withImage(homepage.promoTiles, 'title')) as never,
       shopByPetHeading: 'Shop by pet',
       shopByPet: (await withImage(homepage.shopByPet, 'label')) as never,
@@ -209,7 +249,9 @@ export const seed = async (payload: Payload, { force = false } = {}) => {
   return {
     ok: true,
     message: `Imported ${products.length} products, ${posts.length} articles, ${pages.length} pages and the homepage.${
-      failed ? ` ${failed} image(s) could not be downloaded – you can add them in the admin.` : ''
+      failed
+        ? ` ${failed} photo(s) could not be saved. First problem: ${log[0]}. Fix it, then click Import again – it only adds what's missing.`
+        : ''
     }`,
     log,
   }

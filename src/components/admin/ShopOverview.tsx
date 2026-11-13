@@ -60,6 +60,9 @@ export async function ShopOverview({ req }: WidgetServerProps) {
     payload.find({ collection: 'products', limit: 500, depth: 0, select: { variants: true }, req }),
   ])
 
+  const home = await payload.findGlobal({ slug: 'homepage', depth: 0, req })
+  const needsImport = productCount.totalDocs === 0 || !(home.heroSlides?.length ?? 0)
+
   const revenue = monthOrders.docs.reduce((sum, o) => sum + Number(o.total ?? 0), 0)
   const lowStock = products.docs.filter((p) =>
     (p.variants ?? []).some((v) => typeof v.stock === 'number' && v.stock <= 5),
@@ -75,7 +78,7 @@ export async function ShopOverview({ req }: WidgetServerProps) {
         <p style={{ margin: '4px 0 0', color: 'var(--theme-elevation-600)' }}>Here’s what needs your attention today.</p>
       </div>
 
-      {productCount.totalDocs === 0 && <SeedButton />}
+      {needsImport && <SeedButton />}
 
       <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
         <Stat label="Orders to pack & ship" value={toPack.totalDocs} href="/admin/collections/orders" alert={toPack.totalDocs > 0} />
