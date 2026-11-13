@@ -170,46 +170,98 @@ export const seed = async (payload: Payload, { force = false } = {}) => {
   }
 
   // Homepage
-  const withImage = async <T extends { image: string; alt?: string }>(items: T[], altKey: keyof T) => {
+  // On a fresh shop everything is filled in. Afterwards, re-running only fills
+  // sections that are empty and adds missing phone photos – it never overwrites
+  // changes made in the admin.
+  const withImage = async <T extends { image: string; alt?: string; mobileImage?: string }>(items: T[], altKey: keyof T) => {
     const out = []
     for (const item of items) {
-      const { image, alt, ...rest } = item
-      out.push({ ...rest, image: (await upload(image, String(alt ?? item[altKey] ?? ''))) ?? undefined })
+      const { image, alt, mobileImage, ...rest } = item
+      const label = String(alt ?? item[altKey] ?? '')
+      out.push({
+        ...rest,
+        image: (await upload(image, label)) ?? undefined,
+        ...(mobileImage ? { mobileImage: (await upload(mobileImage, `${label} (phone)`)) ?? undefined } : {}),
+      })
     }
     return out
   }
 
+  const current = await payload.findGlobal({ slug: 'homepage', depth: 0 })
+  const isEmpty = (v: unknown) => !Array.isArray(v) || v.length === 0
   const rowProducts = homepageRowProducts.map((slug) => productIds[slug]).filter(Boolean)
-  await payload.updateGlobal({
-    slug: 'homepage',
-    data: {
-      heroSlides: (await withImage(homepage.heroSlides, 'heading')).filter((sl) => sl.image) as never,
-      promoTiles: (await withImage(homepage.promoTiles, 'title')) as never,
-      shopByPetHeading: 'Shop by pet',
-      shopByPet: (await withImage(homepage.shopByPet, 'label')) as never,
-      infoBlocks: homepage.infoBlocks as never,
-      offersHeading: 'Special offers',
-      offers: (await withImage(homepage.offers, 'title')) as never,
-      featureBanner: {
-        show: true,
-        ...homepage.featureBanner,
-        image: (await upload(homepage.featureBanner.image, 'Dog greeting a delivery at the door')) ?? undefined,
-        bullets: homepage.featureBanner.bullets.map((text) => ({ text })),
-      } as never,
-      imageBanner: {
-        show: true,
-        ...homepage.imageBanner,
-        image: (await upload(homepage.imageBanner.image, 'Dog in a winter coat on a frosty path')) ?? undefined,
-      } as never,
-      firstProductRow: { heading: 'Seasonal favourites', products: rowProducts as never, viewAllLink: '/collections/all' },
-      secondProductRow: { heading: 'Bestsellers', products: rowProducts as never, viewAllLink: '/collections/all' },
-      blogHeading: 'Pet care hub',
-      newsletterHeading: 'Sign up and get 10% off your first order',
-      newsletterText: 'Be the first to hear about offers, new products and expert pet care advice.',
-    },
-  })
+  const homeData: Record<string, unknown> = {}
 
-  // Store settings
+  if (isEmpty(current.heroSlides)) {
+    homeData.heroSlides = (await withImage(homepage.heroSlides, 'heading')).filter((sl) => sl.image)
+  } else {
+    // Keep the client's slides; add phone photos and any starter slide that's missing.
+    const slides = (current.heroSlides ?? []).map((sl) => ({ ...sl })) as Record<string, unknown>[]
+    for (const seedSlide of homepage.heroSlides) {
+      const match = slides.find((sl) => sl.heading === seedSlide.heading)
+      if (match) {
+        if (!match.mobileImage && seedSlide.mobileImage) {
+          match.mobileImage = (await upload(seedSlide.mobileImage, `${seedSlide.heading} (phone)`)) ?? undefined
+        }
+      } else {
+        const [added] = await withImage([seedSlide], 'heading')
+        if (added.image) slides.push(added)
+      }
+    }
+    homeData.heroSlides = slides
+  }
+  if (isEmpty(current.promoTiles)) homeData.promoTiles = await withImage(homepage.promoTiles, 'title')
+  if (isEmpty(current.shopByPet)) {
+    homeData.shopByPetHeading = current.shopByPetHeading || 'Shop by pet'
+    homeData.shopByPet = await withImage(homepage.shopByPet, 'label')
+  }
+  if (isEmpty(current.infoBlocks)) homeData.infoBlocks = homepage.infoBlocks
+  if (isEmpty(current.offers)) {
+    homeData.offersHeading = current.offersHeading || 'Special offers'
+    homeData.offers = await withImage(homepage.offers, 'title')
+  }
+  if (!current.featureBanner?.image) {
+    homeData.featureBanner = {
+      show: true,
+      ...homepage.featureBanner,
+      image: (await upload(homepage.featureBanner.image, 'Dog greeting a delivery at the door')) ?? undefined,
+      bullets: homepage.featureBanner.bullets.map((text) => ({ text })),
+    }
+  }
+  if (!current.imageBanner?.image) {
+    const { mobileImage, ...banner } = homepage.imageBanner
+    homeData.imageBanner = {
+      show: true,
+      ...banner,
+      image: (await upload(banner.image, 'Dog in a winter coat on a frosty path')) ?? undefined,
+      mobileImage: (await upload(mobileImage, 'Dog in a winter coat on a frosty path (phone)')) ?? undefined,
+    }
+  } else if (!current.imageBanner.mobileImage && homepage.imageBanner.mobileImage) {
+    homeData.imageBanner = {
+      ...current.imageBanner,
+      mobileImage: (await upload(homepage.imageBanner.mobileImage, 'Dog in a winter coat on a frosty path (phone)')) ?? undefined,
+    }
+  }
+  if (isEmpty(current.firstProductRow?.products)) {
+    homeData.firstProductRow = { heading: 'Seasonal favourites', products: rowProducts, viewAllLink: '/collections/all' }
+  }
+  if (isEmpty(current.secondProductRow?.products)) {
+    homeData.secondProductRow = { heading: 'Bestsellers', products: rowProducts, viewAllLink: '/collections/all' }
+  }
+  if (!current.blogHeading) homeData.blogHeading = 'Pet care hub'
+  if (!current.newsletterHeading) {
+    homeData.newsletterHeading = 'Sign up and get 10% off your first order'
+    homeData.newsletterText = 'Be the first to hear about offers, new products and expert pet care advice.'
+  }
+  if (Object.keys(homeData).length) {
+    await payload.updateGlobal({ slug: 'homepage', data: homeData as never })
+  }
+
+  // Store settings – only on a fresh shop, so later changes are never overwritten
+  const currentSettings = await payload.findGlobal({ slug: 'site-settings', depth: 0 })
+  if (currentSettings.logo) {
+    return finish()
+  }
   const endsAt = new Date(Date.now() + settings.promo.daysFromNow * 86400000).toISOString()
   await payload.updateGlobal({
     slug: 'site-settings',
@@ -245,14 +297,18 @@ export const seed = async (payload: Payload, { force = false } = {}) => {
     },
   })
 
-  const failed = log.length
-  return {
-    ok: true,
-    message: `Imported ${products.length} products, ${posts.length} articles, ${pages.length} pages and the homepage.${
-      failed
-        ? ` ${failed} photo(s) could not be saved. First problem: ${log[0]}. Fix it, then click Import again – it only adds what's missing.`
-        : ''
-    }`,
-    log,
+  return finish()
+
+  function finish() {
+    const failed = log.length
+    return {
+      ok: true,
+      message: `Done – products, articles, pages and homepage are up to date (nothing you changed was overwritten).${
+        failed
+          ? ` ${failed} photo(s) could not be saved. First problem: ${log[0]}. Fix it, then click again – it only adds what's missing.`
+          : ''
+      }`,
+      log,
+    }
   }
 }

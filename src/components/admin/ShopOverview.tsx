@@ -61,7 +61,10 @@ export async function ShopOverview({ req }: WidgetServerProps) {
   ])
 
   const home = await payload.findGlobal({ slug: 'homepage', depth: 0, req })
-  const needsImport = productCount.totalDocs === 0 || !(home.heroSlides?.length ?? 0)
+  const needsImport =
+    productCount.totalDocs === 0 ||
+    [home.heroSlides, home.promoTiles, home.shopByPet, home.infoBlocks, home.offers].some((v) => !v?.length) ||
+    !home.imageBanner?.mobileImage
 
   const revenue = monthOrders.docs.reduce((sum, o) => sum + Number(o.total ?? 0), 0)
   const lowStock = products.docs.filter((p) =>
@@ -78,7 +81,7 @@ export async function ShopOverview({ req }: WidgetServerProps) {
         <p style={{ margin: '4px 0 0', color: 'var(--theme-elevation-600)' }}>Here’s what needs your attention today.</p>
       </div>
 
-      {needsImport && <SeedButton />}
+      {needsImport && <SeedButton fresh={productCount.totalDocs === 0} />}
 
       <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
         <Stat label="Orders to pack & ship" value={toPack.totalDocs} href="/admin/collections/orders" alert={toPack.totalDocs > 0} />

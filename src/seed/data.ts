@@ -297,6 +297,7 @@ export const homepage = {
   heroSlides: [
     {
       image: 'Gemini_Generated_Image_9gp9d39gp9d39gp9.jpg',
+      mobileImage: 'slide_1_m.jpg',
       alt: 'A dog and cat sleeping by the fire with winter presents',
       eyebrow: 'Winter sale',
       heading: 'Up to 20% off pet essentials',
@@ -361,6 +362,7 @@ export const homepage = {
   },
   imageBanner: {
     image: 'Winter.jpg',
+    mobileImage: 'Winter_Mobile.jpg',
     heading: 'Winter wellness',
     text: 'Keep them cosy, healthy and happy all season.',
     buttonLabel: 'Shop winter',

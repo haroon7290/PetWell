@@ -1531,17 +1531,18 @@ textarea {
   body {
     font-size: 14px;
   }
+  /* Same spacing as the Shopify theme on phones: 20px sides, 40px between sections */
   .page-width {
-    padding: 0 16px;
+    padding: 0 20px;
   }
   .section {
-    padding: 22px 0;
+    padding: 20px 0;
   }
   .section__title {
-    font-size: 21px;
+    font-size: 22px;
   }
   .section__head {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
   }
 
   /* Announcement bars */
@@ -1607,6 +1608,7 @@ textarea {
   .usp ul {
     justify-content: flex-start;
     scroll-snap-type: x mandatory;
+    scroll-padding-inline: 20px;
     scrollbar-width: none;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -1619,7 +1621,7 @@ textarea {
     font-size: 12px;
   }
 
-  /* Slideshow: photo on top, text card below */
+  /* Slideshow (as on Shopify): square photo, text on a light panel below */
   .hero {
     background: var(--color-bg-alt);
   }
@@ -1627,24 +1629,27 @@ textarea {
     min-height: 0;
     flex-direction: column;
     align-items: stretch;
-    padding-bottom: 34px;
+    justify-content: flex-start;
+    padding-bottom: 30px;
   }
   .hero__slide .hero__img {
     position: relative;
     inset: auto;
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
   }
   .hero__slide .page-width {
-    padding: 0 12px;
+    padding: 0;
   }
   .hero__card {
     max-width: none;
-    margin-top: -36px;
-    padding: 18px 18px 20px;
-    border-radius: var(--radius-card);
+    margin: 0;
+    padding: 18px 20px 4px;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
   }
   .hero__heading {
     font-size: 25px;
@@ -1681,10 +1686,10 @@ textarea {
     gap: 12px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    scroll-padding: 0 16px;
+    scroll-padding: 0 20px;
     scrollbar-width: none;
-    margin: 0 -16px;
-    padding: 2px 16px 6px;
+    margin: 0 -20px;
+    padding: 2px 20px 6px;
   }
   .scroll-row::-webkit-scrollbar {
     display: none;
