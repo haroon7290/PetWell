@@ -318,6 +318,8 @@ export interface Media {
    * Describe the photo in a few words, e.g. "Golden retriever on a grey dog bed".
    */
   alt?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -411,6 +413,8 @@ export interface Prescription {
  */
 export interface PrescriptionFile {
   id: number;
+  prefix?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -809,6 +813,8 @@ export interface PrescriptionsSelect<T extends boolean = true> {
  * via the `definition` "prescription-files_select".
  */
 export interface PrescriptionFilesSelect<T extends boolean = true> {
+  prefix?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -881,6 +887,8 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  prefix?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

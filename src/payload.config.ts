@@ -105,6 +105,9 @@ export default buildConfig({
   plugins: [
     vercelBlobStorage({
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+      // Keep the storage columns in the database whether or not Blob is connected,
+      // so the schema (and migrations) are the same everywhere.
+      alwaysInsertFields: true,
       collections: {
         media: { disablePayloadAccessControl: true },
         'prescription-files': true,
