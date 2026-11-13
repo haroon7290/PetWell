@@ -1010,6 +1010,10 @@ export interface Homepage {
   heroSlides?:
     | {
         image: number | Media;
+        /**
+         * A taller/square crop looks best on phones. If empty, the computer photo is used.
+         */
+        mobileImage?: (number | null) | Media;
         eyebrow?: string | null;
         heading: string;
         text?: string | null;
@@ -1068,6 +1072,10 @@ export interface Homepage {
   featureBanner?: {
     show?: boolean | null;
     image?: (number | null) | Media;
+    /**
+     * A taller/square crop looks best on phones. If empty, the computer photo is used.
+     */
+    mobileImage?: (number | null) | Media;
     eyebrow?: string | null;
     heading?: string | null;
     bullets?:
@@ -1082,6 +1090,10 @@ export interface Homepage {
   imageBanner?: {
     show?: boolean | null;
     image?: (number | null) | Media;
+    /**
+     * A taller/square crop looks best on phones. If empty, the computer photo is used.
+     */
+    mobileImage?: (number | null) | Media;
     heading?: string | null;
     text?: string | null;
     buttonLabel?: string | null;
@@ -1205,6 +1217,7 @@ export interface HomepageSelect<T extends boolean = true> {
     | T
     | {
         image?: T;
+        mobileImage?: T;
         eyebrow?: T;
         heading?: T;
         text?: T;
@@ -1258,6 +1271,7 @@ export interface HomepageSelect<T extends boolean = true> {
     | {
         show?: T;
         image?: T;
+        mobileImage?: T;
         eyebrow?: T;
         heading?: T;
         bullets?:
@@ -1274,6 +1288,7 @@ export interface HomepageSelect<T extends boolean = true> {
     | {
         show?: T;
         image?: T;
+        mobileImage?: T;
         heading?: T;
         text?: T;
         buttonLabel?: T;

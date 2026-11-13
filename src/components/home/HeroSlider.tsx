@@ -29,7 +29,7 @@ export const HeroSlider = ({ slides }: { slides: Slide[] }) => {
       <div className="hero__track" style={{ transform: `translateX(-${index * 100}%)` }}>
         {slides.map((s, i) => (
           <div className="hero__slide" key={s.id ?? i} aria-hidden={i !== index}>
-            <Img media={s.image} size="large" priority={i === 0} sizes="100vw" />
+            <Img media={s.image} mobileMedia={s.mobileImage} size="large" priority={i === 0} sizes="100vw" className="hero__img" />
             <div className="page-width" style={{ width: '100%' }}>
               <div className="hero__card">
                 {s.eyebrow && <div className="hero__eyebrow">{s.eyebrow}</div>}

@@ -36,7 +36,7 @@ const ProductRow = ({
             </Link>
           )}
         </div>
-        <div className="product-grid">
+        <div className="product-grid scroll-row scroll-row--products">
           {products.slice(0, 5).map((p) => (
             <ProductCard key={p.id} product={p} currency={currency} />
           ))}
@@ -57,7 +57,7 @@ export default async function HomePage() {
 
       {(home.promoTiles?.length ?? 0) > 0 && (
         <section className="section">
-          <div className="page-width tiles">
+          <div className="page-width tiles scroll-row scroll-row--tiles">
             {home.promoTiles!.map((t) => (
               <Link key={t.id} href={t.link || '/collections/all'} className={`tile tile--${t.colour || 'orange'}`}>
                 <Img media={t.image} className="tile__img" sizes="(max-width: 860px) 50vw, 260px" />
@@ -77,7 +77,7 @@ export default async function HomePage() {
             <h2 className="section__title" style={{ marginBottom: 18 }}>
               {home.shopByPetHeading}
             </h2>
-            <div className="tiles">
+            <div className="tiles scroll-row scroll-row--pets">
               {home.shopByPet!.map((p) => (
                 <Link key={p.id} href={p.link || '/collections/all'} className="pet-tile">
                   <Img media={p.image} sizes="(max-width: 860px) 50vw, 260px" />
@@ -116,7 +116,7 @@ export default async function HomePage() {
             <h2 className="section__title" style={{ marginBottom: 18 }}>
               {home.offersHeading}
             </h2>
-            <div className="tiles tiles--3">
+            <div className="tiles tiles--3 scroll-row scroll-row--offers">
               {home.offers!.map((o) => (
                 <Link key={o.id} href={o.link || '/collections/all'} className="offer">
                   <div className="offer__media">
@@ -163,7 +163,7 @@ export default async function HomePage() {
                   </Link>
                 )}
               </div>
-              <Img media={fb.image} size="large" className="feature-banner__img" sizes="(max-width: 860px) 100vw, 660px" />
+              <Img media={fb.image} mobileMedia={fb.mobileImage} size="large" className="feature-banner__img" sizes="(max-width: 860px) 100vw, 660px" />
             </div>
           </div>
         </section>
@@ -185,7 +185,7 @@ export default async function HomePage() {
                 Visit the hub <ChevronIcon size={12} />
               </Link>
             </div>
-            <div className="post-grid">
+            <div className="post-grid scroll-row scroll-row--posts">
               {posts.map((p) => (
                 <PostCard key={p.id} post={p} />
               ))}
@@ -198,7 +198,7 @@ export default async function HomePage() {
         <section className="section">
           <div className="page-width">
             <div className="image-banner">
-              <Img media={ib.image} size="large" sizes="100vw" />
+              <Img media={ib.image} mobileMedia={ib.mobileImage} size="large" sizes="100vw" className="image-banner__img" />
               <div className="image-banner__content">
                 <h2>{ib.heading}</h2>
                 {ib.text && <p>{ib.text}</p>}

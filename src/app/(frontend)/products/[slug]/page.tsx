@@ -108,7 +108,7 @@ export default async function ProductPage({ params }: Props) {
           <h2 className="section__title" style={{ marginBottom: 18 }}>
             You may also like
           </h2>
-          <div className="product-grid">
+          <div className="product-grid scroll-row scroll-row--products">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} currency={currency} />
             ))}

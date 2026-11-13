@@ -32,7 +32,22 @@ export const Homepage: GlobalConfig = {
               label: 'Slides',
               labels: { singular: 'Slide', plural: 'Slides' },
               fields: [
-                { name: 'image', type: 'upload', relationTo: 'media', required: true },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'image', type: 'upload', relationTo: 'media', required: true, label: 'Photo (computer)', admin: { width: '50%' } },
+                    {
+                      name: 'mobileImage',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: 'Photo for phones (optional)',
+                      admin: {
+                        width: '50%',
+                        description: 'A taller/square crop looks best on phones. If empty, the computer photo is used.',
+                      },
+                    },
+                  ],
+                },
                 { name: 'eyebrow', type: 'text', label: 'Small heading', admin: { placeholder: 'e.g. Winter sale' } },
                 { name: 'heading', type: 'text', required: true },
                 { name: 'text', type: 'text' },
@@ -156,7 +171,22 @@ export const Homepage: GlobalConfig = {
               label: 'Green banner (Subscribe & Save)',
               fields: [
                 { name: 'show', type: 'checkbox', defaultValue: true },
-                { name: 'image', type: 'upload', relationTo: 'media' },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'image', type: 'upload', relationTo: 'media', label: 'Photo (computer)', admin: { width: '50%' } },
+                    {
+                      name: 'mobileImage',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: 'Photo for phones (optional)',
+                      admin: {
+                        width: '50%',
+                        description: 'A taller/square crop looks best on phones. If empty, the computer photo is used.',
+                      },
+                    },
+                  ],
+                },
                 { name: 'eyebrow', type: 'text', label: 'Small heading' },
                 { name: 'heading', type: 'text' },
                 {
@@ -179,7 +209,22 @@ export const Homepage: GlobalConfig = {
               label: 'Photo banner (Winter wellness)',
               fields: [
                 { name: 'show', type: 'checkbox', defaultValue: true },
-                { name: 'image', type: 'upload', relationTo: 'media' },
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'image', type: 'upload', relationTo: 'media', label: 'Photo (computer)', admin: { width: '50%' } },
+                    {
+                      name: 'mobileImage',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: 'Photo for phones (optional)',
+                      admin: {
+                        width: '50%',
+                        description: 'A taller/square crop looks best on phones. If empty, the computer photo is used.',
+                      },
+                    },
+                  ],
+                },
                 { name: 'heading', type: 'text' },
                 { name: 'text', type: 'text' },
                 {

@@ -60,6 +60,11 @@ export const ProductListing = ({
 
   return (
     <div className="listing">
+      {/* Phones: the filters open from this button (no JavaScript needed). */}
+      <input type="checkbox" id="filter-toggle" className="filter-toggle" />
+      <label htmlFor="filter-toggle" className="filter-toggle-btn btn btn--outline">
+        Filter{params.instock === '1' || params.min || params.max ? ' (on)' : ''}
+      </label>
       <form className="filters" method="get">
         {params.q && <input type="hidden" name="q" value={params.q} />}
         {params.sort && <input type="hidden" name="sort" value={params.sort} />}
