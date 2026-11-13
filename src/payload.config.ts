@@ -23,8 +23,22 @@ const dirname = path.dirname(filename)
 const databaseUrl =
   process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.DATABASE_URI || ''
 
+// Addresses allowed to use the admin login: your main address plus Vercel's
+// automatic addresses (production and preview deployments).
+const trustedOrigins = [
+  process.env.NEXT_PUBLIC_SERVER_URL,
+  process.env.VERCEL_PROJECT_PRODUCTION_URL && `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`,
+  process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`,
+  process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+  'http://localhost:3000',
+]
+  .filter((u): u is string => Boolean(u))
+  .map((u) => u.replace(/\/$/, ''))
+
 export default buildConfig({
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || '',
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL?.replace(/\/$/, '') || '',
+  csrf: trustedOrigins,
+  cors: trustedOrigins,
   admin: {
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
