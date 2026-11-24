@@ -1,6 +1,7 @@
 import type { WidgetServerProps } from 'payload'
 import React from 'react'
 
+import { ProductImport } from './ProductImport'
 import { SeedButton } from './SeedButton'
 
 const card: React.CSSProperties = {
@@ -99,6 +100,8 @@ export async function ShopOverview({ req }: WidgetServerProps) {
         <Action label="Banners & delivery prices" href="/admin/globals/site-settings" />
         <Action label="Open the website ↗" href="/" />
       </div>
+
+      <ProductImport />
     </div>
   )
 }
